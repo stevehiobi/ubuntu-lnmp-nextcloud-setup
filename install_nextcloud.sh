@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set +x
 
 ##################################
 # Check if user is root
@@ -151,7 +151,11 @@ if [ ! -f /etc/nginx/conf.d/nextcloud.conf ]; then
         echo "##########################################"
         echo "Create nextcloud.conf file in /etc/nginx/conf.d/ directory"
         echo "##########################################"
-        cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/conf.d/nextcloud.conf
+        cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/sites-available/nextcloud.conf
+        #Now create a symbolic link from nextcloud block configuration file to the /etc/nginx/sites-enabled/ directory:
+        ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+        #Unlink the default configuration
+        sudo unlink /etc/nginx/sites-enabled/default
         VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
         if [ -z "$VERIFY_NGINX_CONFIG" ]; then
                 echo "##########################################"
