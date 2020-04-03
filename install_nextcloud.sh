@@ -25,11 +25,13 @@ echo " Updating Packages"
 echo "##########################################"
 apt-get update
 apt-get upgrade -y
+apt-get autoremove -y --purge
+apt-get autoclean -y
 
 echo "##########################################"
 echo " Installing useful packages"
 echo "##########################################"
-apt-get install -y wget curl git unzip zip tar autoremove
+apt-get install -y wget curl git unzip zip
 
 ##################################
 # Clone repository
@@ -45,7 +47,7 @@ else
 fi
 
 #Now install NGINX
-if [ ! -d /etc/mysql ]; then
+if [ ! -d /etc/nginx ]; then
         #Install MariaDB
         echo ""
         echo "##########################################"
@@ -74,7 +76,6 @@ if [ ! -d /etc/mysql ]; then
         echo -e '[client]\nuser = root' > $HOME/.my.cnf
         echo "password = $MYSQL_ROOT_PASS" >>$HOME/.my.cnf
         cp -f $HOME/.my.cnf /etc/mysql/conf.d/my.cnf
-        mysql --user=root
         #1. Set password for root user
         #2. Delete anonymus user
         #3. Ensure the root user can not log in remotely
