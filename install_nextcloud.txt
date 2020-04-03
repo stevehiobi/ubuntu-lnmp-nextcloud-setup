@@ -1,0 +1,144 @@
+sudo apt update && sudo apt upgrade
+
+#Install services
+sudo apt install -y wget curl gnupg2 git lsb-release ssl-cert ca-certificates apt-transport-https tree locate software-properties-common dirmngr screen htop net-tools zip unzip curl ffmpeg ghostscript libfile-fcntllock-perl -y
+
+#Install NGinx
+
+#Add key for nginx-Repositories
+curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+
+#Add package sources
+sudo nano /etc/apt/sources.list.d/nginx.list
+#Insert the following lines
+# Nginx (Mainline)
+deb [arch=amd64] http://nginx.org/packages/mainline/ubuntu/ bionic nginx
+deb-src [arch=amd64] http://nginx.org/packages/mainline/ubuntu/ bionic nginx
+
+sudo apt-get install nginx
+sudo systemctl enable nginx && sudo systemctl start nginx
+systemctl status nginx
+
+#Install MariaDB
+#Add key for repository
+apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+#Install
+sudo apt install mariadb-server mariadb-client
+#Check if the system is running
+systemctl status mariadb
+
+sudo mysql_secure_installation
+
+Type in your root password when requested.
+Set root password? [Y/n] Y
+New password:
+Re-enter new password:
+ 
+Remove anonymous users? [Y/n] Y
+Disallow root login remotely? [Y/n] Y
+Remove test database and access to it? [Y/n] Y
+Reload privilege tables now? [Y/n] Y
+
+
+#We prefer to connect *root* user with a password rather then the *auth_socket*
+#So lets change that
+#Login to your database
+sudo mysql
+#or
+sudo mariadb
+
+#Check all accounts the authentication methods
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+
+#Set password for root user
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+#If Alter doesn't work try 
+UPDATE mysql.user SET authentication_string = PASSWORD('MY_NEW_PASSWORD') WHERE User = 'root' AND Host = 'localhost';
+
+FLUSH PRIVILEGES;
+exit
+
+#Restart the server
+systemctl restart mariadb
+
+'Install PHP
+#Install Supporting Software
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y php7.3
+
+#If you have apach2 installed (it comes with the php installation) you can remove now
+sudo service apache2 stop
+
+#Now install some common extensions
+sudo apt-get install php-imagick php7.3-common php7.3-pdo php7.3-mysql php7.3-fpm php7.3-gd php7.3-json php7.3-curl  php7.3-zip php7.3-xml php7.3-bcmath php7.3-mbstring php7.3-bz2 php7.3-intl
+
+sudo systemctl enable php7.3-fpm 
+sudo systemctl start php7.3-fpm
+
+
+#If you have apach2 installed (it comes with the php installation) you can remove now
+sudo service apache2 stop
+sudo apt-get purge apache2 apache2-utils apache2.2-bin apache2-common
+#or 
+sudo apt-get purge apache2 apache2-utils apache2-bin apache2.2-
+sudo apt-get autoremove
+
+#Test if apache has been removed
+which apache2 # This should return blank
+
+#Configure PHP
+nano /etc/php/7.2/fpm/pool.d/www.conf
+
+#Install nextcloud
+#First lets create a temp folder and download nextcloud
+mkdir temp && cd temp
+wget  https://download.nextcloud.com/server/releases/latest.zip
+unzip latest.zip
+sudo mv nextcloud /var/www/nextcloud/
+
+#Then we need to change the owner of this directory to www-data so that the web server (Nginx) can write to this directory.
+sudo chown -R www-data:www-data /var/www/nextcloud/
+sudo chmod -R 755 /var/www/nextcloud/
+
+
+#Create Nextcloud database
+Login with root and password
+mysql -u root -p
+
+#Now we create the database and db user for nextcloud
+CREATE DATABASE nextcloud DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+GRANT ALL ON nextcloud.* TO 'nextclouduser'@'localhost' IDENTIFIED BY 'Mueckenloch$9';
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+FLUSH PRIVILEGES;
+
+
+#Create nginx config for nextcloud
+sudo nano /etc/nginx/sites-available/nextcloud
+
+#Put the following text inside
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name nextcloud;
+	
+	root /var/www/nextcloud/;
+	
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+    }
+}
+
+#Now create a symbolic link from nextcloud block configuration file to the /etc/nginx/sites-enabled/ directory:
+sudo ln -s /etc/nginx/sites-available/nextcloud /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/shhh.goip.de /etc/nginx/sites-enabled/
+#Unlink the default configuration
+sudo unlink /etc/nginx/sites-enabled/default
+
+#Check if everthing is ok
+sudo nginx -t
+
+#Then restart nginx service
+sudo systemctl reload nginx
