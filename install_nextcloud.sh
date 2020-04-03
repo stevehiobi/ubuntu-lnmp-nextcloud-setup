@@ -91,10 +91,8 @@ if [ ! -d /etc/mysql ]; then
         mysql -e "UPDATE mysql.user set plugin='mysql_native_password' where User='root'"
         # flush privileges
         mysql -e "FLUSH PRIVILEGES"
-
         # reload daemon
         systemctl daemon-reload
-
         # restart mysql
         systemctl restart mariadb
 fi
