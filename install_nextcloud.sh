@@ -48,7 +48,7 @@ fi
 
 #Now install NGINX
 if [ ! -d /etc/nginx ]; then
-        #Install MariaDB
+        #Install NGINX
         echo ""
         echo "##########################################"
         echo " Installing Nginx"
@@ -163,3 +163,23 @@ if [ ! -f /etc/nginx/conf.d/nextcloud.conf ]; then
                 exit -1
         fi
 fi
+
+##################################
+# Configuring ufw
+##################################
+echo "##########################################"
+echo "Configuring ufw"
+echo "##########################################"
+
+if [ ! -d /etc/ufw ]; then
+    apt-get install ufw -y
+fi
+
+# define firewall rules
+ufw logging low
+ufw default allow outgoing
+ufw default deny incoming
+ufw allow 22
+ufw allow 53
+ufw allow http
+ufw allow https
