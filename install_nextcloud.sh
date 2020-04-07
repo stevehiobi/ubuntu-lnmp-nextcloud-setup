@@ -147,27 +147,39 @@ sleep 1
 ##################################
 #Create nextcloud.conf file in /etc/nginx/conf.d/ directory"
 ##################################
-if [ ! -f /etc/nginx/conf.d/nextcloud.conf ]; then
+mv nginx.conf nginx_conf_backup
+cp $HOME/ubuntu-lnmp-nextcloud-setup/nginx.conf /etc/nginx/nginx.conf
+if [ -f /etc/nginx/conf.d/default.conf ]; then
+        mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default_conf_disabled
+fi
+if [ ! -d /etc/nginx/sites-available ]; then
+        mkdir /etc/nginx/sites-available
+fi
+if [ ! -d /etc/nginx/sites-enabled ]; then
+        mkdir /etc/nginx/sites-enabled
+fi
+if [ ! -f /etc/nginx/sites-available/nextcloud.conf ]; then
         echo "##########################################"
-        echo "Create nextcloud.conf file in /etc/nginx/conf.d/ directory"
+        echo "Create nextcloud.conf file in /etc/nginx/sites-available/ directory"
         echo "##########################################"
         cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/sites-available/nextcloud.conf
         #Now create a symbolic link from nextcloud block configuration file to the /etc/nginx/sites-enabled/ directory:
         ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
         #Unlink the default configuration
         sudo unlink /etc/nginx/sites-enabled/default
-        VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
-        if [ -z "$VERIFY_NGINX_CONFIG" ]; then
-                echo "##########################################"
-                echo "Reloading Nginx"
-                echo "##########################################"
-                systemctl restart nginx
-        else
-                echo "##########################################"
-                echo "Nginx configuration is not correct"
-                echo "##########################################"
-                exit -1
-        fi
+fi
+
+VERIFY_NGINX_CONFIG=$(nginx -t 2>&1 | grep failed)
+if [ -z "$VERIFY_NGINX_CONFIG" ]; then
+        echo "##########################################"
+        echo "Reloading Nginx"
+        echo "##########################################"
+        systemctl restart nginx
+else
+        echo "##########################################"
+        echo "Nginx configuration is not correct"
+        echo "##########################################"
+        exit -1
 fi
 
 ##################################
