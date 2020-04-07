@@ -103,7 +103,7 @@ sleep 1
 ##################################
 #Create Nextcloud database
 ##################################
-if [ ! mysql -e 'use nextcloud'] then
+if [ ! mysql -e 'use nextcloud']; then
         echo "##########################################"
         echo "Create Nextcloud database"
         echo "##########################################"
