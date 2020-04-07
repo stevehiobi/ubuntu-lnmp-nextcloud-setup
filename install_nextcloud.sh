@@ -103,7 +103,7 @@ sleep 1
 ##################################
 #Create Nextcloud database
 ##################################
-if ! mysql -e 'use nextcloud'; then
+if [ ! mysql -e 'use nextcloud'] then
         echo "##########################################"
         echo "Create Nextcloud database"
         echo "##########################################"
@@ -127,7 +127,7 @@ if [ ! -d /var/www/nextcloud ]; then
         mv nextcloud /var/www/nextcloud/
         mkdir -p /var/nextcloud_data
         chown -R www-data:www-data /var/www/nextcloud/
-        chown -R www-data:www-data /var/nextcloud/
+        chown -R www-data:www-data /var/nextcloud_data/
         chmod -R 755 /var/www/nextcloud/
 fi
 sleep 1
