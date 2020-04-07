@@ -40,5 +40,5 @@ sudo rm -rf /var/www/nextcloud/ -y
 echo '##################################'
 echo 'Cleanup unused packegas'
 echo '##################################'
-sudo apt-get -y autoremove
+sudo apt-get -y autoremove --purge
 sudo apt-get -y autoclean

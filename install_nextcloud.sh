@@ -152,21 +152,29 @@ cp $HOME/ubuntu-lnmp-nextcloud-setup/nginx.conf /etc/nginx/nginx.conf
 if [ -f /etc/nginx/conf.d/default.conf ]; then
         mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default_conf_disabled
 fi
-if [ ! -d /etc/nginx/sites-available ]; then
-        mkdir /etc/nginx/sites-available
-fi
-if [ ! -d /etc/nginx/sites-enabled ]; then
-        mkdir /etc/nginx/sites-enabled
-fi
-if [ ! -f /etc/nginx/sites-available/nextcloud.conf ]; then
+
+if [ ! -f /etc/nginx/conf.d/nextcloud.conf ]; then
         echo "##########################################"
         echo "Create nextcloud.conf file in /etc/nginx/sites-available/ directory"
         echo "##########################################"
-        cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/sites-available/nextcloud.conf
-        #Now create a symbolic link from nextcloud block configuration file to the /etc/nginx/sites-enabled/ directory:
-        ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+        cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/conf.d/nextcloud.conf
 fi
-if [-f /etc/nginx/sites-enabled/default ]; then
+
+# if [ ! -d /etc/nginx/sites-available ]; then
+#         mkdir /etc/nginx/sites-available
+# fi
+# if [ ! -d /etc/nginx/sites-enabled ]; then
+#         mkdir /etc/nginx/sites-enabled
+# fi
+# if [ ! -f /etc/nginx/sites-available/nextcloud.conf ]; then
+#         echo "##########################################"
+#         echo "Create nextcloud.conf file in /etc/nginx/sites-available/ directory"
+#         echo "##########################################"
+#         cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/sites-available/nextcloud.conf
+#         #Now create a symbolic link from nextcloud block configuration file to the /etc/nginx/sites-enabled/ directory:
+#         ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+# fi
+if [ -f /etc/nginx/sites-enabled/default ]; then
         #Unlink the default configuration
         sudo unlink /etc/nginx/sites-enabled/default
 fi
