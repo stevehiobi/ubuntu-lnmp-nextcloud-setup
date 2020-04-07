@@ -32,7 +32,7 @@ sudo apt-get purge --auto-remove nginx -y
 echo '##################################'
 echo 'Remove nextcloud'
 echo '##################################'
-sudo rm -rf /var/www/nextcloud/ -y
+sudo rm -rf /var/www/nextcloud/
 
 ##################################
 #Cleanup unused packegas

@@ -16,7 +16,6 @@ fi
 ##################################
 # Welcome
 ##################################
-
 echo ""
 echo "Welcome to ubuntu-nextcloud-nginx-web-server setup script."
 echo ""
@@ -34,19 +33,6 @@ echo "##########################################"
 echo " Installing useful packages"
 echo "##########################################"
 apt-get install -y wget curl git unzip zip
-
-##################################
-# Clone repository
-##################################
-echo "###########################################"
-echo " Clone ubuntu-lnmp-nextcloud-setup"
-echo "###########################################"
-
-if [ ! -d $HOME/ubuntu-lnmp-nextcloud-setup ]; then
-        git clone https://github.com/stevehiobi/ubuntu-lnmp-nextcloud-setup.git $HOME/ubuntu-lnmp-nextcloud-setup
-else
-        git -C $HOME/ubuntu-lnmp-nextcloud-setup pull
-fi
 
 #Now install NGINX
 if [ ! -d /etc/nginx ]; then
@@ -138,9 +124,11 @@ if [ ! -d /var/www/nextcloud ]; then
         mkdir $HOME/temp && cd $HOME/temp
         wget  https://download.nextcloud.com/server/releases/latest.zip
         unzip latest.zip
-        sudo mv nextcloud /var/www/nextcloud/
-        sudo chown -R www-data:www-data /var/www/nextcloud/
-        sudo chmod -R 755 /var/www/nextcloud/
+        mv nextcloud /var/www/nextcloud/
+        mkdir -p /var/nextcloud_data
+        chown -R www-data:www-data /var/www/nextcloud/
+        chown -R www-data:www-data /var/nextcloud/
+        chmod -R 755 /var/www/nextcloud/
 fi
 sleep 1
 
@@ -155,7 +143,7 @@ fi
 
 if [ ! -f /etc/nginx/conf.d/nextcloud.conf ]; then
         echo "##########################################"
-        echo "Create nextcloud.conf file in /etc/nginx/sites-available/ directory"
+        echo "Create nextcloud.conf file in /etc/nginx/conf.d/ directory"
         echo "##########################################"
         cp $HOME/ubuntu-lnmp-nextcloud-setup/nextcloud_HTTP_nginx.conf /etc/nginx/conf.d/nextcloud.conf
 fi
